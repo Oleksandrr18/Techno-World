@@ -17,6 +17,9 @@ DEBUG = os.getenv('DEBUG') == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
 
+# Добавьте DEFAULT_AUTO_FIELD здесь
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
