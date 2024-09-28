@@ -11,21 +11,30 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+from typing import Any
 
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
 
 
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
+# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '&0er(t#&rcq714(8huxq15l=wobe#muvrq%wnzu=qpb==$d^r)'
+
+from dotenv import load_dotenv
+load_dotenv()
+
+SECRET_KEY = os.getenv('SECRET_KEY')
+DB_HOST = os.getenv('DB_HOST')
+DB_NAME = os.getenv('DB_NAME')
+DB_USER = os.getenv('DB_USER')
+DB_PORT = os.getenv('DB_PORT')
+DB_PASSWORD = os.getenv('DB_PASSWORD')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [os.getenv('ALLOWED_HOSTS')]
 
 
 # Application definition
@@ -55,6 +64,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -86,13 +96,28 @@ WSGI_APPLICATION = 'django_ecommerce.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-DATABASES = {
-    'default': {
+DATABASES = {}
+
+if DEBUG:
+    # True Local
+    DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
-}
+else:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DB_HOST,
+        'PORT': DB_PORT,
+    }
+
+
 
 
 # Password validation
